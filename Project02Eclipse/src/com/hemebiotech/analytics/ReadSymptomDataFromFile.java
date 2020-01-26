@@ -1,47 +1,46 @@
 package com.hemebiotech.analytics;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.TreeMap;
 
-/**
- * Simple brute force implementation
- *
- */
 public class ReadSymptomDataFromFile implements ISymptomReader {
 
-	private String filepath;
-	
-	/**
-	 * 
-	 * @param filepath a full or partial path to file with symptom strings in it, one per line
-	 */
-	public ReadSymptomDataFromFile (String filepath) {
+	String filepath;
+	String fileResult;
+
+	public ReadSymptomDataFromFile(String filepath) {
 		this.filepath = filepath;
 	}
-	
-	@Override
-	public List<String> GetSymptoms() {
-		ArrayList<String> result = new ArrayList<String>();
-		
-		if (filepath != null) {
-			try {
-				BufferedReader reader = new BufferedReader (new FileReader(filepath));
-				String line = reader.readLine();
-				
-				while (line != null) {
-					result.add(line);
-					line = reader.readLine();
-				}
-				reader.close();
-			} catch (IOException e) {
-				e.printStackTrace();
+
+	/**
+	 * With the method GetSymptoms, we first of all import the text file into a list
+	 * and we read all lines at once with readAllLines. Then, we create a TreeMap :
+	 * if the line already contains the name, we increment the counter related to
+	 * the key. If not, we add only one to the value related to the key. This method
+	 * returns the treeMap with key and values.
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+
+	public TreeMap<String, Integer> GetSymptoms() throws Exception {
+
+		List<String> listsymptom = Files.readAllLines(Paths.get(filepath));
+
+		TreeMap<String, Integer> mapSymptom = new TreeMap<>();
+
+		for (String name : listsymptom) {
+
+			if (mapSymptom.containsKey(name)) {
+
+				mapSymptom.put(name, mapSymptom.get(name) + 1);
+			} else {
+
+				mapSymptom.put(name, 1);
 			}
 		}
-		
-		return result;
+		return mapSymptom;
 	}
-
 }
